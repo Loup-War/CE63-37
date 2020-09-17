@@ -1,0 +1,38 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class scipcharater : MonoBehaviour
+{
+    // Start is called before the first frame update
+    public Animator myAnimator;
+    void Start()
+    {
+        Animator myAnimator = GetComponent<Animator>();        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    public void run()
+    {
+        myAnimator.SetBool("Idle", false);
+        myAnimator.SetBool("Jump", false);
+        myAnimator.SetBool("Run", true);
+    }
+    public void idle()
+    {
+        myAnimator.SetBool("Run", false);
+        myAnimator.SetBool("Jump", false);
+        myAnimator.SetBool("Idle", true);
+    }
+    public void jump()
+    {
+        myAnimator.SetBool("Idle", false);
+        myAnimator.SetBool("Run", false);
+        myAnimator.SetBool("Jump", true);
+    }
+}
