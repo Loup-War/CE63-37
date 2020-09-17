@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+using UnityEngine.Audio;
+
+public class PauseMenu : MonoBehaviour
+{
+    public static bool GamePaused = false;
+    public GameObject pauseMenuUI;
+    public AudioMixer audiomixer;
+
+
+    // Update is called once per frame
+
+    void Update()
+    {
+
+    }
+    public void Resume()
+    {
+        pauseMenuUI.SetActive(false);
+        GamePaused = false;
+    }
+    void Pause()
+    {
+        pauseMenuUI.SetActive(true);
+        GamePaused = true;
+    }
+    public void LoadOption()
+    {
+        SceneManager.LoadScene("Option");
+    }
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+    public void setvolume(float volume)
+    {
+        audiomixer.SetFloat("volume", volume);
+    }
+}
