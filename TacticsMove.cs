@@ -1,10 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TacticsMove : MonoBehaviour
 {
     public bool turn = false;
+    public Animator animator,animator2;
 
     List<Tile> selectableTiles = new List<Tile>();
     GameObject[] tiles;
@@ -16,11 +17,13 @@ public class TacticsMove : MonoBehaviour
     public int move = 1;
     public float jumpHeight = 2;
     public float moveSpeed = 2;
+    public int soldierGuard = 0;
+    public int visit = 1;
 
     Vector3 velocity = new Vector3();
     Vector3 heading = new Vector3();
 
-    float halfHeight = 0;
+    //float halfHeight = 0;
 
     //bool fallingDown = false;
     //bool movingEdge = false;
@@ -32,7 +35,7 @@ public class TacticsMove : MonoBehaviour
     {
         tiles = GameObject.FindGameObjectsWithTag("Tile");
 
-        //TurnManager.AddUnit(this);
+
     }
 
     public void GetCurrentTile()
@@ -104,7 +107,8 @@ public class TacticsMove : MonoBehaviour
         path.Clear();
         tile.target = true;
         moving = true;
-
+        animator.SetBool("param_idletorunning", true);
+        animator2.SetBool("IdletoRun", true);
         Tile next = tile;
         while (next != null)
         {
@@ -119,18 +123,16 @@ public class TacticsMove : MonoBehaviour
         {
             Tile t = path.Peek();
             Vector3 target = t.transform.position;
-
-
-            target.y += halfHeight + t.GetComponent<Collider>().bounds.extents.y+0.1f;
+            target.y = 0.51f;
 
             if (Vector3.Distance(transform.position, target) >= 0.05f)
             {
                
                 CalculateHeading(target);
                 SetHorizotalVelocity();               
-              
+       
                 transform.forward = heading;
-                transform.position += velocity * Time.deltaTime;
+                transform.position += velocity * Time.deltaTime ;
             }
             else
             {
@@ -143,6 +145,8 @@ public class TacticsMove : MonoBehaviour
         else
         {
             RemoveSelectableTiles();
+            animator.SetBool("param_idletorunning", false);
+            animator2.SetBool("IdletoRun", false);
             moving = false;
             EndTurn();
         }
