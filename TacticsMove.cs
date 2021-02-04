@@ -19,6 +19,7 @@ public class TacticsMove : MonoBehaviour
     public float moveSpeed = 2;
     public int soldierGuard = 0;
     public int visit = 1;
+    public string guild;
 
     Vector3 velocity = new Vector3();
     Vector3 heading = new Vector3();
