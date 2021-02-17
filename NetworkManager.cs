@@ -1,83 +1,125 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Photon.Pun;
+using TMPro;
+using Photon.Realtime;
+using System.Linq;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    private const string typeName = "MultiPlayer";
-    private const string gameName = "LoupWar";
-    public string stringToEdit = "Your Name";
-    private bool isRefreshingHostList = false;
-    private HostData[] hostList;
+    public static NetworkManager Instance;
+    [SerializeField] TMP_InputField roomName;
+    [SerializeField] TMP_Text errorText;
+    [SerializeField] TMP_Text roomnameText;
+    [SerializeField] GameObject roomListPrefab;
+    [SerializeField] Transform roomListContent;
+    [SerializeField] GameObject playerListPrefab;
+    [SerializeField] Transform playerListContent;
+    [SerializeField] GameObject startGame;
 
-    public GameObject PrefabsObjectsPlayer;
-
-    void OnGUI()
+    private void Awake()
     {
-        if (!Network.isClient && !Network.isServer)
+        Instance = this;
+    }
+    void Start()
+    {
+        PhotonNetwork.ConnectUsingSettings();
+    }
+
+
+    public override void OnConnectedToMaster()
+    {
+        Debug.Log("Connected to master");
+        PhotonNetwork.JoinLobby();
+        PhotonNetwork.AutomaticallySyncScene = true;
+
+    }
+
+    public override void OnJoinedLobby()
+    {
+        MenuManager.Instance.OpenMenu("title");
+        Debug.Log("Joined Suc");
+        PhotonNetwork.NickName = "Player " + Random.Range(0, 100).ToString("000");
+    }
+
+    public void CreateRoom()
+    {
+        if (string.IsNullOrEmpty(roomName.text))
         {
-            GUI.Box(new Rect(10, 10, 250, 200), "Loader Menu");
-            stringToEdit = GUI.TextField(new Rect(20, 40, 200, 20), stringToEdit, 25);
-            if (GUI.Button(new Rect(20, 70, 200, 20), "Start Server"))
-                StartServer();
+            return;
+        }
+        PhotonNetwork.CreateRoom(roomName.text);
+        MenuManager.Instance.OpenMenu("loading");
 
-            if (GUI.Button(new Rect(20, 100, 200, 20), "Refresh Hosts"))
-                RefreshHostList();
+    }
 
-            if (hostList != null)
-            {
-                for (int i = 0; i < hostList.Length; i++)
-                {
-                    if (GUI.Button(new Rect(20, 130 + (150 * i), 200, 20), hostList[i].gameName))
-                        JoinServer(hostList[i]);
-                }
-            }
+    public void JoinRoom(RoomInfo info)
+    {
+        PhotonNetwork.JoinRoom(info.Name);
+        MenuManager.Instance.OpenMenu("loading");
+    }
+
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+        MenuManager.Instance.OpenMenu("loading");
+    }
+
+    public void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
+    }
+
+
+    public override void OnJoinedRoom()
+    {
+        MenuManager.Instance.OpenMenu("room");
+        roomnameText.text = PhotonNetwork.CurrentRoom.Name;
+       
+
+        Player[] players = PhotonNetwork.PlayerList;
+        foreach(Transform child in playerListContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < players.Count(); i++)
+        {
+            Instantiate(playerListPrefab, playerListContent).GetComponent<PlayerList>().SetUp(players[i]);
+        }
+        startGame.SetActive(PhotonNetwork.IsMasterClient);
+
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        startGame.SetActive(PhotonNetwork.IsMasterClient);
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        errorText.text = "Create Failed : " + message;
+        MenuManager.Instance.OpenMenu("error");
+    }
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        foreach (Transform trans in roomListContent)
+        {
+            Destroy(trans.gameObject);
+        }
+
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            if (roomList[i].RemovedFromList)
+                continue;
+            Instantiate(roomListPrefab, roomListContent).GetComponent<RoomList>().SetUp(roomList[i]);
         }
     }
 
-    private void StartServer()
+    public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Network.InitializeServer(5, 25000, !Network.HavePublicAddress());
-        MasterServer.RegisterHost(typeName, gameName);
-    }
-
-    void OnServerInitialized()
-    {
-        CreatePlayer();
-    }
-
-
-    void Update()
-    {
-        if (isRefreshingHostList && MasterServer.PollHostList().Length > 0)
-        {
-            isRefreshingHostList = false;
-            hostList = MasterServer.PollHostList();
-        }
-    }
-
-    private void RefreshHostList()
-    {
-        if (!isRefreshingHostList)
-        {
-            isRefreshingHostList = true;
-            MasterServer.RequestHostList(typeName);
-        }
-    }
-
-
-    private void JoinServer(HostData hostData)
-    {
-        Network.Connect(hostData);
-    }
-
-    void OnConnectedToServer()
-    {
-        CreatePlayer();
-    }
-
-
-    private void CreatePlayer()
-    {
-        Network.Instantiate(PrefabsObjectsPlayer, Vector3.up * 5, Quaternion.identity, 0);
+        Instantiate(playerListPrefab, playerListContent).GetComponent<PlayerList>().SetUp(newPlayer);
     }
 }
