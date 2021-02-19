@@ -1,10 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public class PlayMoment : TacticsMove
-{ 
+{
+
     void Start()
     {
         Init();
@@ -24,6 +25,7 @@ public class PlayMoment : TacticsMove
         else
         {
             Move();
+
         }
     }
     void CheckMouse()
