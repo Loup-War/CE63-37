@@ -17,6 +17,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject playerListPrefab;
     [SerializeField] Transform playerListContent;
     [SerializeField] GameObject startGame;
+    [SerializeField] GameObject roomFull;
 
     private void Awake()
     {
@@ -49,7 +50,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        PhotonNetwork.CreateRoom(roomName.text);
+        RoomOptions rm = new RoomOptions
+        {
+
+            MaxPlayers = 4,
+            IsVisible = true
+
+        };
+        PhotonNetwork.CreateRoom(roomName.text, rm, TypedLobby.Default);
+        //PhotonNetwork.CreateRoom(roomName.text);
         MenuManager.Instance.OpenMenu("loading");
 
     }
@@ -58,6 +67,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.JoinRoom(info.Name);
         MenuManager.Instance.OpenMenu("loading");
+        if (info.MaxPlayers == info.PlayerCount)
+        {
+            foreach (Transform child in roomListContent)
+            {
+                Destroy(child.gameObject);
+            }
+            roomFull.SetActive(true);
+        }
+
+
     }
 
 
@@ -70,6 +89,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         PhotonNetwork.LoadLevel(1);
+
     }
 
 
@@ -77,10 +97,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         MenuManager.Instance.OpenMenu("room");
         roomnameText.text = PhotonNetwork.CurrentRoom.Name;
-       
+
 
         Player[] players = PhotonNetwork.PlayerList;
-        foreach(Transform child in playerListContent)
+        foreach (Transform child in playerListContent)
         {
             Destroy(child.gameObject);
         }
@@ -102,6 +122,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         errorText.text = "Create Failed : " + message;
         MenuManager.Instance.OpenMenu("error");
+
     }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
@@ -122,4 +143,5 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         Instantiate(playerListPrefab, playerListContent).GetComponent<PlayerList>().SetUp(newPlayer);
     }
+    
 }
