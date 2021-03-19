@@ -1,54 +1,40 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-public class CharacterSelection : MonoBehaviour
+using Photon.Pun;
+using Photon.Realtime;
+using UnityEngine.UI;
+
+public class CharacterSelect : MonoBehaviour
 {
-    private GameObject[] characterList;
-    private int index;
 
-    private void Start()
+    PhotonView PV;
+
+    [SerializeField] public Button[] characters;
+
+    private Button lastClicked = null;
+
+    private void Awake()
     {
-        index = PlayerPrefs.GetInt("CharacterSelected");
-
-        characterList = new GameObject[transform.childCount];
-
-        for(int i = 0; i < transform.childCount; i++)
-            characterList[i] = transform.GetChild(i).gameObject;
-
-        foreach (GameObject go in characterList)
-            go.SetActive(false);
-
-        if (characterList[index])
-            characterList[index].SetActive(true);
+        PV = GetComponent<PhotonView>();
     }
 
-    public void NextCharacter()
+
+    [PunRPC]
+    public void OnSelect(int id)
     {
-        characterList[index].SetActive(false);
+        if (lastClicked != null)
+        {
+            lastClicked.interactable = true;
+        }
 
-        index++;
-        if (index == characterList.Length)
-            index = 0;
+        characters[id].interactable = false;
+        lastClicked = characters[id];
 
-        characterList[index].SetActive(true);
     }
 
-    public void PrevCharacter()
+    public void OnClicked(int id)
     {
-        characterList[index].SetActive(false);
-
-        index--;
-        if (index < 0)
-            index = characterList.Length - 1;
-
-        characterList[index].SetActive(true);
-            
-    }
-
-    public void Selection()
-    {
-        PlayerPrefs.SetInt("CharacterSelected", index);
-        SceneManager.LoadScene(1);
+        PV.RPC("OnSelect", RpcTarget.All, id);
     }
 }
