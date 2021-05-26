@@ -8,8 +8,10 @@ using UnityEngine.SceneManagement;
 public class EndGame : MonoBehaviour
 {
     public bool endgame = false;
+    public bool lastp1, lastp2;
     public GameObject player, player1, player2, player3, player4, inventory1;
     public GameObject victoryscore, moneysharingg;
+    public GameObject disconnet;
     public Text one, two, three, four, moneyone, moneytwo, moneythree, moneyfour;
     public float tem1, tem2, tem3, tem4;
 
@@ -18,24 +20,32 @@ public class EndGame : MonoBehaviour
     }
     void Update()
     {
-        if (player1 == null)
+            player1 = GameObject.FindGameObjectWithTag("Player1");
+            player2 = GameObject.FindGameObjectWithTag("Player2");
+            player3 = GameObject.FindGameObjectWithTag("Player3");
+            player4 = GameObject.FindGameObjectWithTag("Player4");
+        if (player == null)
         {
-            player1 = inventory1.GetComponent<Inventory>().player1;
-            player2 = inventory1.GetComponent<Inventory>().player2;
-            player3 = inventory1.GetComponent<Inventory>().player3;
-            player4 = inventory1.GetComponent<Inventory>().player4;
-            player = inventory1.GetComponent<Inventory>().player;
+            if (player1.GetComponent<PhotonView>().IsMine == true)
+            {
+                player = GameObject.FindGameObjectWithTag("Player1");
+            }
+            else if (player2.GetComponent<PhotonView>().IsMine == true)
+            {
+                player = GameObject.FindGameObjectWithTag("Player2");
+            }
+            else if (player3.GetComponent<PhotonView>().IsMine == true)
+            {
+                player = GameObject.FindGameObjectWithTag("Player3");
+            }
+            else if (player4.GetComponent<PhotonView>().IsMine == true)
+            {
+                player = GameObject.FindGameObjectWithTag("Player4");
+            }
         }
         else if (player != null)
         {
-            if (player1.GetComponent<PlayerMoney>().money == 0 && inventory1.GetComponent<Inventory>().weightall == 0)
-            {
-                if (player4 != null)
-                {
-
-                }
-            }
-            else if (TurnSys.TurnShow == 250)
+            if (TurnSys.TurnShow == 200)
             {
                 if (player4 != null)
                 {
@@ -275,8 +285,8 @@ public class EndGame : MonoBehaviour
                         tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
                         one.text = "Player 2";
                         two.text = "Player 1";
-                        moneyone.text = tem1.ToString() + " G " ;
-                        moneytwo.text = tem2.ToString() + " G " ;
+                        moneyone.text = tem1.ToString() + " G ";
+                        moneytwo.text = tem2.ToString() + " G ";
                         three.text = "";
                         moneythree.text = "";
                         four.text = "";
@@ -293,7 +303,7 @@ public class EndGame : MonoBehaviour
                     if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp1 == true)
                     {
                         one.text = "Player 1";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp2 > moneysharingg.GetComponent<CharingMoney>().moneyshowp3)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp2;
@@ -380,7 +390,7 @@ public class EndGame : MonoBehaviour
                     else if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp2 == true)
                     {
                         one.text = "Player 2";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp1 > moneysharingg.GetComponent<CharingMoney>().moneyshowp3)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
@@ -467,7 +477,7 @@ public class EndGame : MonoBehaviour
                     else if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp3 == true)
                     {
                         one.text = "Player 3";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp1 > moneysharingg.GetComponent<CharingMoney>().moneyshowp2)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
@@ -554,7 +564,7 @@ public class EndGame : MonoBehaviour
                     else if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp4 == true)
                     {
                         one.text = "Player 4";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp1 > moneysharingg.GetComponent<CharingMoney>().moneyshowp2)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
@@ -638,13 +648,14 @@ public class EndGame : MonoBehaviour
                             }
                         }
                     }
+                    victoryscore.SetActive(true);
                 }
                 else if (player3 != null && player4 == null)
                 {
                     if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp1 == true)
                     {
                         one.text = "Player 1";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp2 > moneysharingg.GetComponent<CharingMoney>().moneyshowp3)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp2;
@@ -672,7 +683,7 @@ public class EndGame : MonoBehaviour
                     if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp2 == true)
                     {
                         one.text = "Player 2";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp1 > moneysharingg.GetComponent<CharingMoney>().moneyshowp3)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
@@ -699,7 +710,7 @@ public class EndGame : MonoBehaviour
                     if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp3 == true)
                     {
                         one.text = "Player 3";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         if (moneysharingg.GetComponent<CharingMoney>().moneyshowp1 > moneysharingg.GetComponent<CharingMoney>().moneyshowp2)
                         {
                             tem2 = moneysharingg.GetComponent<CharingMoney>().moneyshowp1;
@@ -731,38 +742,77 @@ public class EndGame : MonoBehaviour
                     if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp1 == true)
                     {
                         one.text = "Player 1";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         two.text = "Player 2";
                         moneytwo.text = moneysharingg.GetComponent<CharingMoney>().moneyshowp2.ToString() + " G ";
+                        victoryscore.SetActive(true);
                     }
-                    else if(moneysharingg.GetComponent<CharingMoney>().mystoreShowp2 == true)
+                    else if (moneysharingg.GetComponent<CharingMoney>().mystoreShowp2 == true)
                     {
                         one.text = "Player 2";
-                        moneyone.text = "บรรลุเป้าหมายของเกม";
+                        moneyone.text = "บรรลุเป้าหมาย";
                         two.text = "Player 1";
                         moneytwo.text = moneysharingg.GetComponent<CharingMoney>().moneyshowp1.ToString() + " G ";
+                        victoryscore.SetActive(true);
                     }
-                    
-                   victoryscore.SetActive(true);
-                    
                 }
+            }
+            else if (player.GetComponent<PlayMoment>().playerlastone == true)
+            {
+                if (disconnet.GetComponent<PlayerDiscon>().lastp1 == true)
+                {
+                    one.text = "Player 1";
+                    moneyone.text = "บรรลุเป้าหมาย";
+                    two.text = "Player 2";
+                    moneytwo.text = " ออก ";
+                }
+                else if (disconnet.GetComponent<PlayerDiscon>().lastp2 == true)
+                {
+                    one.text = "Player 2";
+                    moneyone.text = "บรรลุเป้าหมาย";
+                    two.text = "Player 1";
+                    moneytwo.text = " ออก ";
+                }
+                victoryscore.SetActive(true);
             }
         }
     }
     public void BuyStore()
     {
-        if(player.GetComponent<PlayerMoney>().money > 100000)
+        if (player.GetComponent<PlayerMoney>().money > 100000)
         {
             player.GetComponent<PlayerMoney>().money -= 100000;
             player.GetComponent<PlayMoment>().myStore = true;
             moneysharingg.GetComponent<CharingMoney>().EndGameStore();
         }
-        
+
     }
     public void BacktoLobby()
     {
-        SceneManager.LoadScene(0);
+        {
+            StartCoroutine(DisconnectAndLoad());
+        }
+    }
+    IEnumerator DisconnectAndLoad()
+    {
+        PhotonNetwork.Disconnect();
+        Destroy(NetworkManager.Instance);
+        Destroy(RoomManager.Instance);
+        PhotonNetwork.LeaveRoom();
+        while (PhotonNetwork.InRoom)
+            yield return null;
+        SceneManager.LoadScene("Lobby");
+        //PhotonNetwork.ConnectUsingSettings();
+        //Debug.Log("Connected to master");
+        //PhotonNetwork.JoinLobby();
+        //PhotonNetwork.AutomaticallySyncScene = true;
     }
 
-}
+    public void Click_ExitGame()
+    {
+        Application.Quit();
+    }
 
+
+
+}
