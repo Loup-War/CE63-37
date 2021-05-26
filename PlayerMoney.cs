@@ -23,6 +23,5 @@ public class PlayerMoney : MonoBehaviour
     }
     void Update()
     {
-        MoneyText.text = "Gold : " + money;
     }
 }
